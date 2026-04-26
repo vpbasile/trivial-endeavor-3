@@ -29,7 +29,7 @@ export const categoryList: category[] = [
 ]
 
 
-export async function getQuestion(categoryID: string, devMode: boolean): Promise<questionInternal> {
+export async function getQuestions(categoryID: string, limit: number, devMode: boolean): Promise<questionInternal[]> {
     // ---------------------------------------------
     // <><> This stuff is all specific to this particualr API
     // ---------------------------------------------
@@ -37,20 +37,23 @@ export async function getQuestion(categoryID: string, devMode: boolean): Promise
         // ---------------------------------------------
         // <><> Send the query
         // ---------------------------------------------
-        const queryURL = `https://the-trivia-api.com/v2/questions?limit=1&categories=${categoryID}&difficulties=medium%2Chard`;
+        const queryURL = `https://the-trivia-api.com/v2/questions?limit=${limit}&categories=${categoryID}&difficulties=medium%2Chard`;
         const response = await fetch(queryURL);
-        const receivedQuestion: questionFromAPI[] = await response.json();
-        // }
+        const receivedQuestions: questionFromAPI[] = await response.json();
 
         // ---------------------------------------------
-        // <><> Parse and return the result
+        // <><> Parse and return the results
         // ---------------------------------------------
-        // The API returns an array of question objects.  Currently, I'm requesting these one at a time so I always use the first question
-        return parseReceivedQuestion(receivedQuestion[0], devMode);
+        return receivedQuestions.map(q => parseReceivedQuestion(q, devMode));
     } catch (error) {
         console.error("Error encountered", (error as Error).message);
         throw error; // It's generally a good practice to rethrow errors in async functions.
     }
+}
+
+export async function getQuestion(categoryID: string, devMode: boolean): Promise<questionInternal> {
+    const questions = await getQuestions(categoryID, 1, devMode);
+    return questions[0];
 }
 
 function parseReceivedQuestion(questionData: questionFromAPI, devMode: boolean): questionInternal {

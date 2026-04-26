@@ -20,7 +20,7 @@ export default function CategoryButton(props: categoryButtonProps) {
 
 	const handleClick = () => {
 		console.log(`${player.name} requests a ${category.title} question`);
-		newQuestion(category, devMode, dispatch, player.index);
+		newQuestion(category, devMode, dispatch, player.index, gameState.questionCache);
 	};
 
 	// If the player is a winner, the button should be gold and disabled.
