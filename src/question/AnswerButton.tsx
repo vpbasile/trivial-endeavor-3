@@ -45,9 +45,9 @@ export default function AnswerButton(props: AnswerButtonProps) {
 				whiteSpace={'normal'}
 				w={'100%'}
 				py={2}
-				// isDisabled={isDisabled}				
+				isDisabled={isDisabled}
 				variant={isDisabled ? 'display-only' : 'solid'}
-				onClick={() => handleGuess(question, index, gameState.playerList[currentPlayerIndex], question.categoryTag, neededToWin, dispatch)}
+				onClick={isDisabled ? undefined : () => handleGuess(question, index, gameState.playerList[currentPlayerIndex], question.categoryTag, neededToWin, dispatch)}
 			>
 				{text}
 			</Button>

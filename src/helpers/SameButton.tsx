@@ -20,13 +20,13 @@ export function SameButton(
         alignContent={'center'}
         borderRadius={'lg'}
         border={isDisabled ? 'none' : '8px'}
+        isDisabled={isDisabled}
         variant={isDisabled ? 'display-only' : 'solid'}
         bg={color + '.' + bg}
         color={color + '.' + fg}
         leftIcon={leftIcon}
         rightIcon={rightIcon}
-        // isDisabled={isDisabled}
-        onClick={onClick} >
+        onClick={isDisabled ? undefined : onClick} >
         {text}
     </Button >)
 }

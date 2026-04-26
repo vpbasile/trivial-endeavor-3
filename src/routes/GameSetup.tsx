@@ -26,10 +26,10 @@ export default function GameSetup() {
 
 	const playerCount = numberOfPlayers
 	const rosterMaxed: boolean = playerCount < 4
-	const rosterMinnd: boolean = playerList.length === 1;
+	const rosterMinnd: boolean = playerCount <= 1;
 
-	const addTeam = () => { const x = numberOfPlayers + 1; SETnumberOfPlayers(x) }
-	const removeTeam = () => { const x = numberOfPlayers - 1; SETnumberOfPlayers(x) }
+	const addTeam = () => { SETnumberOfPlayers((current) => Math.min(4, current + 1)) }
+	const removeTeam = () => { SETnumberOfPlayers((current) => Math.max(1, current - 1)) }
 
 	const addButton =
 		<Button

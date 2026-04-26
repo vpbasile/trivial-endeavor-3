@@ -1,6 +1,7 @@
 import { Dispatch } from "react";
 import { GameAction, category, nullQuestion } from "../gameReducer";
 import { getQuestion } from "../helpers/queryTheTrivia";
+import { SameButton } from "../helpers/SameButton";
 /**
  *Requests a new question from the API and updates the game state with that question
  *
@@ -27,7 +28,10 @@ export const newQuestion = async (category: category, devMode: boolean, dispatch
             dispatch({ type: "phase_3_answer_question", payload: { question, playerIndex } });
         } catch (error) {
             console.error("Error fetching question:", error);
-            // Handle the error appropriately, e.g., show an error message to the user
+            dispatch({
+                type: "phase_2_question_error",
+                payload: <SameButton text="Could not load a question. Please try that category again." color="incorrect" isDisabled />
+            });
         }
     }
 }

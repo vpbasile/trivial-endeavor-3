@@ -62,6 +62,7 @@ export type GameAction =
     { type: "phase_1_begin_game" } |
     { type: "phase_5_next_player" } | // Payload is the player index for the next player
     { type: "phase_2_get_question" } |
+    { type: "phase_2_question_error", payload: JSX.Element } |
     { type: "phase_3_answer_question", payload: { question: questionInternal, playerIndex: number } } |
     { type: "phase_4_feedback", payload: { guess: guessType, message: JSX.Element } } |
     // Question actions
@@ -104,6 +105,9 @@ export default function gameReducer(state: gameStateType, action: GameAction): g
             // Get a question of the selected category for the current player
             console.log("-Begin phase_2_get_question-");
             return { ...state, currentPhase: "Question", currentQuestion: nullQuestion(), displayMessage: <SameButton color='grey' text={`Please wait`} isDisabled /> };
+        }
+        case "phase_2_question_error": {
+            return { ...state, currentPhase: "Select", currentQuestion: nullQuestion(), displayMessage: action.payload };
         }
         case "phase_3_answer_question": {
             // Display the choices

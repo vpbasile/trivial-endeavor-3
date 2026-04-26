@@ -24,7 +24,15 @@ export default function GameBoard() {
     // Access the parameters from the URL
     const { devModeEntered, playerNames } = useParams();
     let playerNamesArray: string[] = [];
-    if (playerNames) playerNamesArray = playerNames.split("-");
+    if (playerNames) {
+        playerNamesArray = playerNames
+            .split("-")
+            .map((name) => name.trim())
+            .filter(Boolean);
+    }
+    if (playerNamesArray.length === 0) {
+        playerNamesArray = ["Player 1"];
+    }
     const playerListInit = playerNamesArray.map((name, index) => ({ index, key: index, name, correctCategories: [], wonPlace: 0 }))
 
     const firstPlayerName = playerListInit[0].name;
