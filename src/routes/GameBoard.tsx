@@ -5,16 +5,16 @@
  */
 import { ArrowForwardIcon, QuestionIcon } from "@chakra-ui/icons";
 import { Box, Collapse, VStack } from "@chakra-ui/react";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useParams } from "react-router-dom";
 import DataDisplay from "../dev/DataDisplay";
-import gameReducer, { gameStateType, nullQuestion } from "../gameReducer";
+import gameReducer, { gameStateType, nullQuestion, questionCache } from "../gameReducer";
 import ColorModeButton from "../helpers/ColorModeButton";
 import DevModeButton from "../helpers/DevModeButton";
 import { SameButton } from "../helpers/SameButton";
 import AppRow from "../helpers/appRow";
-import { categoryList } from "../helpers/queryTheTrivia";
+import { categoryList, getQuestions, questionInternal } from "../helpers/queryTheTrivia";
 import { newBreaks } from "../helpers/style";
 import QuestionDisplay from "../question/QuestionDisplay";
 import PlayerColumn from "../scoreboard/PlayerColumn";
@@ -36,6 +36,8 @@ export default function GameBoard() {
     const playerListInit = playerNamesArray.map((name, index) => ({ index, key: index, name, correctCategories: [], wonPlace: 0 }))
 
     const firstPlayerName = playerListInit[0].name;
+    const isDevMode = devModeEntered === "1";
+    const numPlayers = playerListInit.length;
     const initialGameState: gameStateType = {
         currentPhase: "Select",
         currentPlayerIndex: 0,
@@ -48,11 +50,33 @@ export default function GameBoard() {
         playerList: playerListInit,
         askedQuestions: [""],
         // If devMode is 1, then the game is in developer mode.
-        devMode: (devModeEntered === "1"),
-        neededToWin: (devModeEntered === "1") ? 2 : categoryList.length,
+        devMode: isDevMode,
+        neededToWin: isDevMode ? 2 : categoryList.length,
+        questionCache: {},
     }
 
     const [gameState, dispatch] = useReducer(gameReducer, initialGameState);
+
+    // Pre-fetch questions for all categories at game start (P questions per category)
+    useEffect(() => {
+        if (!isDevMode) {
+            console.log(`Pre-fetching ${numPlayers} questions per category for ${numPlayers} players`);
+            Promise.all(
+                categoryList.map(cat =>
+                    getQuestions(cat.queryTag, numPlayers, false)
+                        .then(questions => ({ categoryTag: cat.queryTag, questions }))
+                        .catch(() => ({ categoryTag: cat.queryTag, questions: [] as questionInternal[] }))
+                )
+            ).then(results => {
+                const cache: questionCache = {};
+                results.forEach(({ categoryTag, questions }) => {
+                    cache[categoryTag] = questions;
+                });
+                dispatch({ type: "SET_question_cache", payload: cache });
+                console.log(`Pre-fetch complete. Cached questions for ${Object.keys(cache).length} categories.`);
+            });
+        }
+    }, [isDevMode, numPlayers]);
     const { currentPhase, playerList, currentPlayerIndex, playerIndicator, displayMessage } = gameState;
 
     let icon = undefined;

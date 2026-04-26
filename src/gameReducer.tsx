@@ -20,6 +20,8 @@ export type gamePhase = "Welcome" | "Select" | "Question" | "Answer" | "Feedback
 export type situationHolder = { phase: gamePhase, currentPlayerIndex: number }
 export type dispatchType = Dispatch<GameAction>;
 
+export type questionCache = Record<string, questionInternal[]>
+
 export type gameStateType = {
     currentPhase: gamePhase,
     currentPlayerIndex: number,
@@ -33,6 +35,7 @@ export type gameStateType = {
     askedQuestions: string[],
     devMode: boolean,
     neededToWin: number,
+    questionCache: questionCache,
 }
 
 // The props for the game components should mosly be the same
@@ -71,6 +74,7 @@ export type GameAction =
     { type: "give_player_medal", payload: { playerIndex: number } } |
     { type: "clear_question" } |
     { type: "SETaskedQuestions", payload: string[] } | // Payload is the id of the new question to add to the list
+    { type: "SET_question_cache", payload: questionCache } |
     { type: "rematch" }
 export default function gameReducer(state: gameStateType, action: GameAction): gameStateType {
 
@@ -205,6 +209,8 @@ export default function gameReducer(state: gameStateType, action: GameAction): g
         case "rematch": return state;
         case "SETaskedQuestions":
             return { ...state, askedQuestions: action.payload };
+        case "SET_question_cache":
+            return { ...state, questionCache: action.payload };
         default:
             return state;
     }
